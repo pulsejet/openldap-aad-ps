@@ -15,7 +15,7 @@ function Get-RandomCharacters($length) {
 # Search for given filter
 function LDAPSearch($filter)
 {
-	$attrs = 'uid', 'uidNumber', 'mail', 'cn', 'sn', 'givenName'
+	$attrs = 'uid', 'uidNumber', 'mail', 'cn', 'sn', 'givenName', 'mailalternateaddress'
 	$auth = [System.DirectoryServices.AuthenticationTypes]::SecureSocketsLayer
 	$de = New-Object System.DirectoryServices.DirectoryEntry($LDAPDN, $LDAPUser, $LDAPPass, $auth)
 	$ds = New-Object System.DirectoryServices.DirectorySearcher($de, $filter, $attrs)
@@ -26,14 +26,14 @@ function LDAPSearch($filter)
 }
 
 # Run sync on one user object
-function syncOneUser($user)
+function syncOneUser($luser)
 {
-	$uid = "$($user.uid)"
-	$mail = "$($user.mail)"
-	$uidNumber = "$($user.uidnumber)"
-	$cn = "$($user.cn)"
-	$givenName = "$($user.givenname)"
-	$sn = "$($user.sn)"
+	$uid = "$($luser.uid)"
+	$mail = "$($luser.mail)"
+	$uidNumber = "$($luser.uidnumber)"
+	$cn = "$($luser.cn)"
+	$givenName = "$($luser.givenname)"
+	$sn = "$($luser.sn)"
 
 	# Change domain for testing
 	# $mail = "$uid@iitb.radialapps.com"
@@ -42,7 +42,7 @@ function syncOneUser($user)
 	$logStr = "uid=$uid mail=$mail uidNumber=$uidNumber"
 
 	# Check vital fields present
-	if (!$user.uid -OR !$user.uidnumber -OR !$user.mail) {
+	if (!$luser.uid -OR !$luser.uidnumber -OR !$luser.mail) {
 		echo "$(GetDateString) [ERROR] MISSING_FIELDS: $logStr"
 		return
 	}
@@ -78,6 +78,12 @@ function syncOneUser($user)
 	# Update the user after creation/check
 	echo "$(GetDateString) [INFO] USER_UPDATE: $logStr"
 
+	# Get alternate email addresses of user
+	$alternateMailAddresses = $null
+	if ($luser.mailalternateaddress) {
+		$alternateMailAddresses = @($luser.mailalternateaddress)
+	}
+
 	# Update the user object in Azure AD
 	Set-AzureADUser `
 		-ObjectID $user.UserPrincipalName `
@@ -86,7 +92,8 @@ function syncOneUser($user)
 		-MailNickName $uid `
 		-DisplayName $cn `
 		-GivenName $givenName `
-		-Surname $sn
+		-Surname $sn `
+		-OtherMails $alternateMailAddresses
 
 	# To get available licenses use Get-MsolAccountSku
 	# https://docs.microsoft.com/en-us/office365/enterprise/powershell/assign-licenses-to-user-accounts-with-office-365-powershell
