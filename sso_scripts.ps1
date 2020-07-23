@@ -60,7 +60,7 @@ New-MsolUser `
   -ImmutableId 59609 `
   -DisplayName "Varun Patil" `
   -FirstName "Varun" `
-  -LastName "Patil" # -LicenseAssignment "SOMETHING NEEDS TO BE HERE"
+  -LastName "Patil" # -LicenseAssignment "SEE THE LICENSE SECTION"
 
 # UPDATE USER INFO
 # https://docs.microsoft.com/en-us/powershell/module/msonline/set-msoluser
@@ -73,4 +73,10 @@ Set-MsolUser `
 #       to a different domain first, then change ImmutableID using the new UPN
 #       and move the user back to the federated domain
 Set-MsolUser -UserPrincipalName "username@domain.com" -ImmutableId 12345
+# ================================================================================
+
+# ============================== LICENSE =========================================
+# Get available licenses for specifying in LicenseAssignment
+# https://docs.microsoft.com/en-us/office365/enterprise/powershell/assign-licenses-to-user-accounts-with-office-365-powershell
+Get-MsolAccountSku
 # ================================================================================
