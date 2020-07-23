@@ -16,13 +16,13 @@ function runSyncOnFilter($filter)
 
 	# Connect to Azure only if we have something to work on
 	if ($results) {
-		echo "$(GetDateString) [DEBUG] LDAP: $(@($results).length) objects found"
-		echo "$(GetDateString) [DEBUG] CONNECT: Connecting to Azure AD"
+		Write-Output "$(GetDateString) [DEBUG] LDAP: $(@($results).length) objects found"
+		Write-Output "$(GetDateString) [DEBUG] CONNECT: Connecting to Azure AD"
 		$stat = Connect-AzureAD -Credential $AADCred
 		if (!$?) { exit 1 }
-		echo "$(GetDateString) [DEBUG] CONNECT: Successfully connected to Azure AD"
+		Write-Output "$(GetDateString) [DEBUG] CONNECT: Successfully connected to Azure AD"
 	} else {
-		echo "$(GetDateString) [DEBUG] LDAP: No objects found"
+		Write-Output "$(GetDateString) [DEBUG] LDAP: No objects found"
 		exit 0
 	}
 
