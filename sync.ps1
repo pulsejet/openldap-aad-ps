@@ -1,6 +1,6 @@
 # Import modules
-# Make sure installed with Install-Module MSOnline
-Import-Module MSOnline
+# Make sure installed with Install-Module AzureAD
+Import-Module AzureAD
 
 # Import functions
 . "$($PWD.Path)\config.ps1"
@@ -18,7 +18,7 @@ function runSyncOnFilter($filter)
 	if ($results) {
 		echo "$(GetDateString) [DEBUG] LDAP: $(@($results).length) objects found"
 		echo "$(GetDateString) [DEBUG] CONNECT: Connecting to Azure AD"
-		Connect-MSolService -Credential $AADCred
+		$stat = Connect-AzureAD -Credential $AADCred
 		if (!$?) { exit 1 }
 		echo "$(GetDateString) [DEBUG] CONNECT: Successfully connected to Azure AD"
 	} else {

@@ -4,6 +4,14 @@ function GetDateString
 	return ((Get-Date).ToUniversalTime().ToString('yyyyMMddHHmmss') + 'Z')
 }
 
+# Make a random string
+function Get-RandomCharacters($length) {
+	$c = 'abcdefghiklmnoprstuvwxyzABCDEFGHKLMNOPRSTUVWXYZ1234567890!@$#%^&*()'
+    $random = 1..$length | ForEach-Object { Get-Random -Maximum $c.length }
+    $private:ofs = ""
+    return [String]$c[$random]
+}
+
 # Search for given filter
 function LDAPSearch($filter)
 {
@@ -40,37 +48,46 @@ function syncOneUser($user)
 	}
 
 	# Get user from Azure AD
-	$user = (Get-MsolUser | Where-Object {$_.ImmutableId -eq "$uidNumber" -OR $_.UserPrincipalName -eq $mail})
+	$user = Get-AzureADUser -Filter "ImmutableID eq '$uidNumber' or userPrincipalName eq '$mail'"
 
 	# Check user exists
 	if (!$user) {
 		echo "$(GetDateString) [WARN] USER_CREATE: $logStr"
-		$newUser = New-MsolUser `
+
+		# Create random password
+		$PasswordProfile = New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile
+		$PasswordProfile.Password = Get-RandomCharacters(24)
+		$PasswordProfile.EnforceChangePasswordPolicy = $false
+
+		# Create new user
+		$newUser = New-AzureADUser `
 			-UserPrincipalName $mail `
 			-ImmutableId $uidNumber `
-			-DisplayName $cn
-	} else {
-		$user = $user[0]
+			-MailNickName $uid `
+			-DisplayName $cn `
+			-AccountEnabled $true `
+			-PasswordProfile $PasswordProfile
 
-		# Check if UPN has changed
-		if ($user.UserPrincipalName -ne $mail) {
-			echo "$(GetDateString) [WARN] UPN_CHANGE: $logStr"
-			Set-MsolUserPrincipalName `
-				-UserPrincipalName $user.UserPrincipalName `
-				-NewUserPrincipalName $mail
-		}
+		# Process our new user
+		$user = @($newUser)
 	}
+
+	# Get first if many
+	$user = $user[0]
 
 	# Update the user after creation/check
 	echo "$(GetDateString) [INFO] USER_UPDATE: $logStr"
 
-	# Set all other fields and hope ImmutableID never changes
-	# To get available licenses use Get-MsolAccountSku
-	# https://docs.microsoft.com/en-us/office365/enterprise/powershell/assign-licenses-to-user-accounts-with-office-365-powershell
-	Set-MsolUser `
+	# Update the user object in Azure AD
+	Set-AzureADUser `
+		-ObjectID $user.UserPrincipalName `
 		-UserPrincipalName $mail `
 		-ImmutableId $uidNumber `
+		-MailNickName $uid `
 		-DisplayName $cn `
-		-FirstName $givenName `
-		-LastName $sn # -LicenseAssignment $AzureLicense
+		-GivenName $givenName `
+		-Surname $sn
+
+	# To get available licenses use Get-MsolAccountSku
+	# https://docs.microsoft.com/en-us/office365/enterprise/powershell/assign-licenses-to-user-accounts-with-office-365-powershell
 }
