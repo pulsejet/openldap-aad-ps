@@ -45,10 +45,9 @@ $lastSync = (Get-Content -Path lastsync.txt).Trim()
 if (!$lastSync) { $lastSync = '19700101000000Z' }
 
 # Run sync after previous known time
-echo "$(GetDateString) [INFO] Syncing all users modified after $lastSync"
+Write-Output "$(GetDateString) [INFO] Syncing all users modified after $lastSync"
 runSyncOnFilter("(&(modifytimestamp>=$lastSync)(uid=*))")
 
 # Put timestamp before we started
-$t = GetDateString
-echo "$(GetDateString) [INFO] Done syncing all users modified till $startTimestamp"
+Write-Output "$(GetDateString) [INFO] Done syncing all users modified till $startTimestamp"
 Set-Content -Path lastsync.txt -Value $startTimestamp

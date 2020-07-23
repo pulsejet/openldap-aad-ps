@@ -45,7 +45,7 @@ function syncOneUser($luser)
 
 	# Check vital fields present
 	if (!$luser.uid -OR !$luser.uidnumber -OR !$luser.mail) {
-		echo "$(GetDateString) [ERROR] MISSING_FIELDS: $logStr"
+		Write-Output "$(GetDateString) [ERROR] MISSING_FIELDS: $logStr"
 		return
 	}
 
@@ -54,7 +54,7 @@ function syncOneUser($luser)
 
 	# Check user exists
 	if (!$user) {
-		echo "$(GetDateString) [WARN] USER_CREATE: $logStr"
+		Write-Output "$(GetDateString) [WARN] USER_CREATE: $logStr"
 
 		# Create random password
 		$PasswordProfile = New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile
@@ -78,7 +78,7 @@ function syncOneUser($luser)
 	$user = $user[0]
 
 	# Update the user after creation/check
-	echo "$(GetDateString) [INFO] USER_UPDATE: $logStr"
+	Write-Output "$(GetDateString) [INFO] USER_UPDATE: $logStr"
 
 	# Get alternate email addresses of user
 	$alternateMailAddresses = $null
@@ -105,7 +105,7 @@ function syncOneUser($luser)
 
 					# Create new group
 					if (!$grp) {
-						echo "$(GetDateString) [WARN] NEW_GROUP: $groupName"
+						Write-Output "$(GetDateString) [WARN] NEW_GROUP: $groupName"
 						$grp = New-AzureADGroup `
 							-DisplayName $groupName `
 							-MailEnabled $false `
@@ -114,7 +114,7 @@ function syncOneUser($luser)
 					}
 
 					# Add to group
-					echo "$(GetDateString) [INFO] USER_ADD_GROUP: $uid=$groupName"
+					Write-Output "$(GetDateString) [INFO] USER_ADD_GROUP: $uid=$groupName"
 					Add-AzureADGroupMember `
 						-ObjectId $grp.ObjectID `
 						-RefObjectId $user.ObjectID
@@ -126,7 +126,7 @@ function syncOneUser($luser)
 	# Check existing groups from which the user has to be removed
 	foreach ($grp in $existingGroups) {
 		if ($grp.DisplayName.startsWith("$($groupPrefix)_") -AND $newGroupNames -cnotcontains $grp.DisplayName) {
-			echo "$(GetDateString) [INFO] USER_REM_GROUP: $uid=$($grp.DisplayName)"
+			Write-Output "$(GetDateString) [INFO] USER_REM_GROUP: $uid=$($grp.DisplayName)"
 			Remove-AzureADGroupMember `
 				-ObjectId $grp.ObjectID `
 				-MemberId $user.ObjectID
