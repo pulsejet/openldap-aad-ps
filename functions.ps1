@@ -26,10 +26,10 @@ function syncOneUser($user)
 	$cn = "$($user.cn)"
 	$givenName = "$($user.givenname)"
 	$sn = "$($user.sn)"
-	
+
 	# Change domain for testing
 	# $mail = "$uid@iitb.radialapps.com"
-	
+
 	# Information to log
 	$logStr = "uid=$uid mail=$mail uidNumber=$uidNumber"
 
@@ -41,7 +41,7 @@ function syncOneUser($user)
 
 	# Get user from Azure AD
 	$user = (Get-MsolUser | Where-Object {$_.ImmutableId -eq "$uidNumber" -OR $_.UserPrincipalName -eq $mail})
-	
+
 	# Check user exists
 	if (!$user) {
 		echo "$(GetDateString) [WARN] USER_CREATE: $logStr"
