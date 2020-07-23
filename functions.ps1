@@ -9,7 +9,7 @@ function LDAPSearch($filter)
 {
 	$attrs = 'uid', 'uidNumber', 'mail', 'cn', 'sn', 'givenName'
 	$auth = [System.DirectoryServices.AuthenticationTypes]::SecureSocketsLayer
-	$de = New-Object System.DirectoryServices.DirectoryEntry($dn, $user, $pass, $auth)
+	$de = New-Object System.DirectoryServices.DirectoryEntry($LDAPDN, $LDAPUser, $LDAPPass, $auth)
 	$ds = New-Object System.DirectoryServices.DirectorySearcher($de, $filter, $attrs)
 	$ds.PageSize = 50;
 	$result = $ds.FindAll()

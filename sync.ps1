@@ -6,6 +6,9 @@ Import-Module MSOnline
 . "$($PWD.Path)\config.ps1"
 . "$($PWD.Path)\functions.ps1"
 
+# Construct credentials
+$AADCred = New-Object System.Management.Automation.PSCredential -ArgumentList ($AADUser, $AADPassword)
+
 # Run sync on all results in filter
 function runSyncOnFilter($filter)
 {
@@ -15,7 +18,7 @@ function runSyncOnFilter($filter)
 	if ($results) {
 		echo "$(GetDateString) [DEBUG] LDAP: $(@($results).length) objects found"
 		echo "$(GetDateString) [DEBUG] CONNECT: Connecting to Azure AD"
-		Connect-MSolService -Credential $psCred
+		Connect-MSolService -Credential $AADCred
 		if (!$?) { exit 1 }
 		echo "$(GetDateString) [DEBUG] CONNECT: Successfully connected to Azure AD"
 	} else {
