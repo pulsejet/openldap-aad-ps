@@ -18,7 +18,7 @@ function LDAPSearch($filter)
 	$attrs = 'uid', 'uidNumber', 'mail', 'cn', 'sn', 'givenName', 'mailalternateaddress'
 	$attrs = $attrs + $groupFields
 
-	$auth = [System.DirectoryServices.AuthenticationTypes]::SecureSocketsLayer
+	$auth = [System.DirectoryServices.AuthenticationTypes]::None
 	$de = New-Object System.DirectoryServices.DirectoryEntry($LDAPDN, $LDAPUser, $LDAPPass, $auth)
 	$ds = New-Object System.DirectoryServices.DirectorySearcher($de, $filter, $attrs)
 	$ds.PageSize = 50;
