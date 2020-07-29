@@ -1,3 +1,9 @@
+# ========================= DO NOT RUN ===========================================
+Write-Output "DO NOT RUN THIS SCRIPT. READ THE README."
+exit
+Write-Output "IF YOU ARE READING THIS THEN YOU ARE IN TROUBLE!"
+# ================================================================================
+
 # ============================== SETUP ===========================================
 # Install the module to connect to Azure
 Install-Module MSOnline
