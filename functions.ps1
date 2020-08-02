@@ -87,7 +87,7 @@ function syncOneUser($luser)
 	}
 
 	# Get user groups
-	$existingGroups = Get-AzureADUserMembership -ObjectID $mail
+	$existingGroups = Get-AzureADUserMembership -ObjectID $user.ObjectID
 	$existingGroupNames = @($existingGroups.DisplayName)
 	$newGroupNames = @()
 
@@ -135,7 +135,7 @@ function syncOneUser($luser)
 
 	# Update the user object in Azure AD
 	Set-AzureADUser `
-		-ObjectID $user.UserPrincipalName `
+		-ObjectID $user.ObjectID `
 		-UserPrincipalName $mail `
 		-ImmutableId $uidNumber `
 		-MailNickName $uid `
