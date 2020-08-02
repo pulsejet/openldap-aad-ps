@@ -87,7 +87,7 @@ function syncOneUser($luser)
 	}
 
 	# Get user groups
-	$existingGroups = Get-AzureADUserMembership -ObjectID $user.ObjectID
+	$existingGroups = Get-AzureADUserMembership -All $true -ObjectID $user.ObjectID
 	$existingGroupNames = @($existingGroups.DisplayName)
 	$newGroupNames = @()
 
